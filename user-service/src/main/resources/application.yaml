@@ -4,6 +4,19 @@ server:
 spring:
   application:
     name: user-service
+  datasource:
+    url: jdbc:mysql://localhost:3310/user_db?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: root
+    password: user12
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        highlight_sql: true
 
 eureka:
   client:
