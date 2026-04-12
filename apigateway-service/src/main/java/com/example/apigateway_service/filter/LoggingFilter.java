@@ -1,6 +1,5 @@
 package com.example.apigateway_service.filter;
 
-import com.example.apigateway_service.filter.GlobalFilter.Config;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
@@ -36,7 +35,7 @@ public class LoggingFilter extends AbstractGatewayFilterFactory<LoggingFilter.Co
                     log.info("Logging Filter End: response code -> {}", response.getStatusCode());
                 }
             }));
-        }, OrderedGatewayFilter.HIGHEST_PRECEDENCE);
+        }, FilterOrder.LoggingOrder);
 
         return filter;
     }

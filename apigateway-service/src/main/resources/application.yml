@@ -15,23 +15,19 @@ spring:
     gateway:
       server:
         webflux:
-          default-filters:
-            - name: GlobalFilter
-              args:
-                baseMessage: Spring Cloud Gateway WebFlux Global Filter
-                preLogger: true
-                postLogger: true
           routes:
             - id: user-service
               uri: lb://user-service
               predicates:
                 - Path=/user-service/**
               filters:
-                - RewritePath=/user-service/(?<segment>.*), /$\{segment}
-                - AddRequestHeader=s-request, 1st-request-header
-                - AddResponseHeader=s-response, 1st-response-header
+                - name: RouteFilter
+                  args:
+                    prefix: user-service
                 - name: AuthorizationHeaderFilter
-                - name: CustomFilter
+                  args:
+                    excludePaths:
+                      - /login
                 - name: LoggingFilter
                   args:
                     baseMessage: Hi, there.

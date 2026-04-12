@@ -5,10 +5,12 @@ import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import javax.crypto.SecretKey;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHeaders;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
+import org.springframework.cloud.gateway.filter.OrderedGatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -19,18 +21,27 @@ import reactor.core.publisher.Mono;
 
 @Component
 @Slf4j
-public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory {
+public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<AuthorizationHeaderFilter.Config> {
+
+    public AuthorizationHeaderFilter() {
+        super(Config.class);
+    }
 
     @Value("${jwt.secret-key}")
     public String jwtKey;
 
+    @Data
+    public static class Config {
+        private List<String> excludePaths;
+    }
+
     @Override
-    public GatewayFilter apply(Object config) {
-        return ((exchange, chain) -> {
+    public GatewayFilter apply(Config config) {
+        return new OrderedGatewayFilter((exchange, chain) -> {
             ServerHttpRequest request = exchange.getRequest();
             String path = request.getURI().getPath();
 
-            if (path.contains("/login")) {
+            if (config.getExcludePaths() != null && config.getExcludePaths().stream().anyMatch(path::contains)) {
                 return chain.filter(exchange);
             }
 
@@ -51,7 +62,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory {
                     .build();
 
             return chain.filter(exchange.mutate().request(modifiedRequest).build());
-        });
+        }, FilterOrder.AuthorizationOrder);
     }
 
     private String getUserIdFromJwt(String jwt) {
