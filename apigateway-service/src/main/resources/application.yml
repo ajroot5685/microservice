@@ -27,11 +27,16 @@ spring:
               predicates:
                 - Path=/user-service/**
               filters:
+                - RewritePath=/user-service/(?<segment>.*), /$\{segment}
                 - AddRequestHeader=s-request, 1st-request-header
                 - AddResponseHeader=s-response, 1st-response-header
+                - name: AuthorizationHeaderFilter
                 - name: CustomFilter
                 - name: LoggingFilter
                   args:
                     baseMessage: Hi, there.
                     preLogger: true
                     postLogger: true
+
+jwt:
+  secret-key: this_is_a_very_secret_key_for_jwt_token_generation_over_32_characters

@@ -1,5 +1,6 @@
 package com.example.user_service.dto;
 
+import com.example.user_service.repository.UserRole;
 import java.util.Date;
 import lombok.Data;
 
@@ -13,4 +14,5 @@ public class UserDto {
     private Date createdAt;
 
     private String encryptedPwd;
+    private UserRole role;
 }
