@@ -3,14 +3,14 @@ server:
 
 spring:
   application:
-    name: user-service
+    name: catalog-service
   threads:
     virtual:
       enabled: false
   datasource:
-    url: jdbc:mysql://localhost:3310/user_db?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    url: jdbc:mysql://localhost:3312/catalog_db?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     username: root
-    password: user12
+    password: catalog12
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
@@ -20,6 +20,10 @@ spring:
       hibernate:
         format_sql: true
         highlight_sql: true
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
 
 eureka:
   client:
@@ -27,6 +31,3 @@ eureka:
     fetch-registry: true
     service-url:
       defaultZone: http://127.0.0.1:8761/eureka
-
-jwt:
-  secret-key: this_is_a_very_secret_key_for_jwt_token_generation_over_32_characters

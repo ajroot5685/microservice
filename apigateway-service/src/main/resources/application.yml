@@ -30,7 +30,35 @@ spring:
                       - /login
                 - name: LoggingFilter
                   args:
-                    baseMessage: Hi, there.
+                    baseMessage: Hi, User.
+                    preLogger: true
+                    postLogger: true
+            - id: order-service
+              uri: lb://order-service
+              predicates:
+                - Path=/order-service/**
+              filters:
+                - name: RouteFilter
+                  args:
+                    prefix: order-service
+                - name: AuthorizationHeaderFilter
+                - name: LoggingFilter
+                  args:
+                    baseMessage: Hi, Order.
+                    preLogger: true
+                    postLogger: true
+            - id: catalog-service
+              uri: lb://catalog-service
+              predicates:
+                - Path=/catalog-service/**
+              filters:
+                - name: RouteFilter
+                  args:
+                    prefix: catalog-service
+                - name: AuthorizationHeaderFilter
+                - name: LoggingFilter
+                  args:
+                    baseMessage: Hi, Catalog.
                     preLogger: true
                     postLogger: true
 
