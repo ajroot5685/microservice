@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>MSA 개발 통합 관리 도구</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #1e1e1e; color: #cfcfcf; padding: 30px; margin: 0; }
+        h1 { color: #ffffff; border-bottom: 2px solid #333; padding-bottom: 10px; }
+        h3 { margin-top: 0; color: #ecf0f1; border-bottom: 1px solid #444; padding-bottom: 5px; }
+        .card { background: #2d2d2d; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+
+        .btn { background: #3c3c3c; color: #fff; border: 1px solid #555; padding: 8px 16px; cursor: pointer; border-radius: 4px; font-weight: bold; margin-right: 5px; }
+        .btn:hover { background: #505050; }
+        .btn-start { background: #1e7e34; border-color: #1c7430; }
+        .btn-start:hover { background: #218838; }
+        .btn-stop { background: #bd2130; border-color: #b21f2d; }
+        .btn-stop:hover { background: #c82333; }
+        .btn-toggle { background: #2980b9; border-color: #2471a3; }
+        .btn-toggle:hover { background: #3498db; }
+
+        .RUNNING { color: #2ecc71; font-weight: bold; }
+        .STARTING { color: #f1c40f; font-weight: bold; animation: blink 1.5s infinite; }
+        .DOWN { color: #e74c3c; font-weight: bold; }
+
+        .infra-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #444; padding-bottom: 5px; margin-bottom: 15px; }
+        .infra-header h3 { border-bottom: none; margin: 0; }
+        .service-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #3a3a3a; }
+        .service-info { font-size: 16px; }
+
+        .log-container { display: none; margin-top: 10px; padding: 15px; background: #000000; border-radius: 6px; border: 1px solid #444; }
+        .log-container.active { display: block; }
+        .log-title { font-size: 13px; color: #888; margin-bottom: 8px; font-family: monospace; }
+        .log-console { color: #e0e0e0; height: 200px; overflow-y: auto; font-family: 'Courier New', Courier, monospace; font-size: 12px; line-height: 1.5; white-space: pre-wrap; }
+
+        @keyframes blink { 50% { opacity: 0.5; } }
+    </style>
+</head>
+<body>
+
+<h1>MSA 부트 매니저</h1>
+
+<div class="card" id="status-board" hx-get="/fragments/status" hx-trigger="every 3s" hx-swap="outerHTML">
+    <div class="card"
+         style="background: #252525; padding: 15px; margin-bottom: 20px; box-shadow: none; border: 1px solid #3a3a3a;">
+        <div class="infra-header">
+            <h3>공통 인프라 환경 (DB)</h3>
+            <div>
+                <span style="font-size: 14px; margin-right: 6px; color: #aaa;">user_db:</span>
+                <span th:class="${infraStatus}" th:text="${infraStatus}">DOWN</span>
+            </div>
+        </div>
+        <button class="btn" hx-post="/api/manage/infra/up" hx-swap="none">Docker Compose UP</button>
+        <button class="btn" hx-post="/api/manage/infra/down" hx-swap="none">Docker Compose DOWN</button>
+    </div>
+
+    <h3>마이크로서비스 가동 현황</h3>
+    <div th:each="service : ${services}">
+        <div class="service-row">
+            <div class="service-info">
+                <strong th:text="${service.key}">service-name</strong>
+                <span> ── </span>
+                <span th:class="${service.value}" th:text="${service.value}">STATUS</span>
+            </div>
+            <div>
+                <th:block th:if="${service.key != 'local-boot-manager'}">
+                    <button class="btn btn-start" th:hx-post="'/api/manage/service/' + ${service.key} + '/start'"
+                            hx-swap="none">시작
+                    </button>
+                    <button class="btn btn-stop" th:hx-post="'/api/manage/service/' + ${service.key} + '/stop'"
+                            hx-swap="none">중지
+                    </button>
+                </th:block>
+                <th:block th:if="${service.key == 'local-boot-manager'}">
+                    <span style="color: #888; font-size: 13px; margin-right: 10px;">(현재 관리 도구)</span>
+                </th:block>
+                <button class="btn btn-toggle" th:onclick="toggleLog([[${service.key}]])">로그 보기</button>
+            </div>
+        </div>
+
+        <div th:id="'log-container-' + ${service.key}" class="log-container" hx-preserve="true">
+            <div class="log-title" th:text="${service.key} + ' 표준 출력 로그 스트림'">SERVICE LOG</div>
+            <div th:id="'console-' + ${service.key}" class="log-console"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleLog(serviceName) {
+        const container = document.getElementById('log-container-' + serviceName);
+        if (container) {
+            container.classList.toggle('active');
+        }
+    }
+
+    const scrollTracker = {};
+
+    document.addEventListener('htmx:beforeSwap', function() {
+        document.querySelectorAll('.log-console').forEach(el => {
+            scrollTracker[el.id] = {
+                scrollTop: el.scrollTop,
+                isAtBottom: (el.scrollHeight - el.clientHeight - el.scrollTop) < 40
+            };
+        });
+    });
+
+    document.addEventListener('htmx:afterSwap', function() {
+        Object.keys(scrollTracker).forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                if (scrollTracker[id].isAtBottom) {
+                    el.scrollTop = el.scrollHeight;
+                } else {
+                    el.scrollTop = scrollTracker[id].scrollTop;
+                }
+            }
+        });
+    });
+
+    const ws = new WebSocket("ws://localhost:9999/ws/logs");
+
+    ws.onopen = function() {
+        document.querySelectorAll('.log-console').forEach(el => {
+            const serviceName = el.id.replace("console-", "");
+            el.innerHTML = "";
+            ws.send("FETCH_HISTORY:" + serviceName);
+        });
+    };
+
+    ws.onmessage = function(event) {
+        const rawData = event.data;
+        const match = rawData.match(/^\[([^\]]+)\]\s(.*)$/);
+        if (!match) return;
+
+        const serviceName = match[1];
+        const logLine = match[2];
+
+        const consoleDiv = document.getElementById("console-" + serviceName);
+        if (consoleDiv) {
+            const isScrolledToBottom = (consoleDiv.scrollHeight - consoleDiv.clientHeight - consoleDiv.scrollTop) < 40;
+
+            const line = document.createElement("div");
+            line.textContent = logLine;
+            consoleDiv.appendChild(line);
+
+            if (isScrolledToBottom) {
+                consoleDiv.scrollTop = consoleDiv.scrollHeight;
+            }
+        }
+    };
+</script>
+</body>
+</html>
