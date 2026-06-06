@@ -4,39 +4,5 @@ server:
 spring:
   application:
     name: order-service
-  threads:
-    virtual:
-      enabled: true
-  datasource:
-    url: jdbc:mysql://localhost:3311/order_db?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    username: root
-    password: order12
-    driver-class-name: com.mysql.cj.jdbc.Driver
-  jpa:
-    hibernate:
-      ddl-auto: create
-    show-sql: false
-    properties:
-      hibernate:
-        format_sql: true
-        highlight_sql: true
-    defer-datasource-initialization: true
-  sql:
-    init:
-      mode: always
-
-eureka:
-  client:
-    register-with-eureka: true
-    fetch-registry: true
-    service-url:
-      defaultZone: http://127.0.0.1:8761/eureka
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "health"
-  endpoint:
-    health:
-      show-details: always
+  config:
+    import: "configserver:http://localhost:8888"

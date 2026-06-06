@@ -1,75 +1,8 @@
 server:
   port: 8000
 
-eureka:
-  client:
-    register-with-eureka: true
-    fetch-registry: true
-    service-url:
-      defaultZone: http://localhost:8761/eureka
-
 spring:
   application:
     name: apigateway-service
-  cloud:
-    gateway:
-      server:
-        webflux:
-          routes:
-            - id: user-service
-              uri: lb://user-service
-              predicates:
-                - Path=/user-service/**
-              filters:
-                - name: RouteFilter
-                  args:
-                    prefix: user-service
-                - name: AuthorizationHeaderFilter
-                  args:
-                    excludePaths:
-                      - /login
-                - name: LoggingFilter
-                  args:
-                    baseMessage: Hi, User.
-                    preLogger: true
-                    postLogger: true
-            - id: order-service
-              uri: lb://order-service
-              predicates:
-                - Path=/order-service/**
-              filters:
-                - name: RouteFilter
-                  args:
-                    prefix: order-service
-                - name: AuthorizationHeaderFilter
-                - name: LoggingFilter
-                  args:
-                    baseMessage: Hi, Order.
-                    preLogger: true
-                    postLogger: true
-            - id: catalog-service
-              uri: lb://catalog-service
-              predicates:
-                - Path=/catalog-service/**
-              filters:
-                - name: RouteFilter
-                  args:
-                    prefix: catalog-service
-                - name: AuthorizationHeaderFilter
-                - name: LoggingFilter
-                  args:
-                    baseMessage: Hi, Catalog.
-                    preLogger: true
-                    postLogger: true
-
-jwt:
-  secret-key: this_is_a_very_secret_key_for_jwt_token_generation_over_32_characters
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "health"
-  endpoint:
-    health:
-      show-details: always
+  config:
+    import: "configserver:http://localhost:8888"

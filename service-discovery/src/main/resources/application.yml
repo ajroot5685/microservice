@@ -4,20 +4,5 @@ server:
 spring:
   application:
     name: service-discovery
-
-eureka:
-  client:
-    register-with-eureka: false
-    fetch-registry: false
-  server:
-    response-cache-update-interval-ms: 500
-    eviction-interval-timer-in-ms: 3000
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "health"
-  endpoint:
-    health:
-      show-details: always
+  config:
+    import: "configserver:http://localhost:8888"
