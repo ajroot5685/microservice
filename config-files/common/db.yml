@@ -1,0 +1,17 @@
+# target service
+# - user-service
+# - order-service
+# - catalog-service
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        highlight_sql: true
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always

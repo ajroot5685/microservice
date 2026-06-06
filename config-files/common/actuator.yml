@@ -1,0 +1,14 @@
+# target service
+# - service-discovery
+# - apigateway-service
+# - user-service
+# - order-service
+# - catalog-service
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health"
+  endpoint:
+    health:
+      show-details: always

@@ -1,0 +1,5 @@
+# target service
+# - apigateway-service
+# - user-service
+jwt:
+  secret-key: this_is_a_very_secret_key_for_jwt_token_generation_over_32_characters

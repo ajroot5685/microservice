@@ -1,0 +1,14 @@
+spring:
+  config:
+    import:
+      - "../common/eureka-client.yml"
+      - "../common/actuator.yml"
+      - "../common/jpa.yml"
+  threads:
+    virtual:
+      enabled: false
+  datasource:
+    url: jdbc:mysql://localhost:3312/catalog_db?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: root
+    password: catalog12
+    driver-class-name: com.mysql.cj.jdbc.Driver
