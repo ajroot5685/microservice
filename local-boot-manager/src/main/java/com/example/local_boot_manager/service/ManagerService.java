@@ -2,6 +2,7 @@ package com.example.local_boot_manager.service;
 
 import static com.example.local_boot_manager.config.ManagedServiceConstants.APIGATEWAY_SERVICE;
 import static com.example.local_boot_manager.config.ManagedServiceConstants.CATALOG_SERVICE;
+import static com.example.local_boot_manager.config.ManagedServiceConstants.CONFIG_SERVICE;
 import static com.example.local_boot_manager.config.ManagedServiceConstants.LOCAL_BOOT_MANAGER;
 import static com.example.local_boot_manager.config.ManagedServiceConstants.ORDER_SERVICE;
 import static com.example.local_boot_manager.config.ManagedServiceConstants.SERVICE_DISCOVERY;
@@ -28,6 +29,7 @@ public class ManagerService {
     private final Path rootPath = Paths.get("..").toAbsolutePath().normalize();
     private final List<String> managedServices = List.of(
             LOCAL_BOOT_MANAGER,
+            CONFIG_SERVICE,
             SERVICE_DISCOVERY,
             APIGATEWAY_SERVICE,
             USER_SERVICE,

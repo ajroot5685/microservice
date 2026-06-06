@@ -31,13 +31,6 @@ public class UserController {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
 
-    @PostMapping("/users")
-    public ResponseEntity<UserResponse> createUser(@RequestBody UserRequest request) {
-        UserDto userDto = userService.createUser(userMapper.toDto(request));
-        UserResponse response = userMapper.toResponse(userDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-
     @GetMapping("/users")
     public ResponseEntity<List<UserResponse>> getUsers() {
         List<UserResponse> response = userService.getUserByAll().stream()
@@ -50,6 +43,13 @@ public class UserController {
     public ResponseEntity<UserResponse> getUser(@PathVariable("userId") String userId) {
         UserDto userDto = userService.getUserByUserId(userId);
         return ResponseEntity.ok(userMapper.toResponse(userDto));
+    }
+
+    @PostMapping("/signup")
+    public ResponseEntity<UserResponse> createUser(@RequestBody UserRequest request) {
+        UserDto userDto = userService.createUser(userMapper.toDto(request));
+        UserResponse response = userMapper.toResponse(userDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/login")

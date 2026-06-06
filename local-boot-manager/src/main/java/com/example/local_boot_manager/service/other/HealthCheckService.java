@@ -1,5 +1,6 @@
 package com.example.local_boot_manager.service.other;
 
+import static com.example.local_boot_manager.config.ManagedServiceConstants.CONFIG_SERVICE;
 import static com.example.local_boot_manager.config.ManagedServiceConstants.LOCAL_BOOT_MANAGER;
 import static com.example.local_boot_manager.config.ManagedServiceConstants.SERVICE_DISCOVERY;
 
@@ -21,7 +22,10 @@ import reactor.core.publisher.Mono;
 public class HealthCheckService {
 
     private static final String CONTAINER_NAME = "user_db";
-    private static final String SERVICE_DISCOVERY_URL = "http://localhost:8761";
+    private static final Map<String, String> SERVICE_LOCAL_MAP = Map.of(
+            SERVICE_DISCOVERY, "http://localhost:8761",
+            CONFIG_SERVICE, "http://localhost:8888"
+    );
 
     private static final String RUNNING = "RUNNING";
     private static final String DOWN = "DOWN";
@@ -56,31 +60,32 @@ public class HealthCheckService {
             return Mono.just(RUNNING);
         }
 
-        if (SERVICE_DISCOVERY.equals(serviceName)) {
-            return webClient.get()
-                    .uri(SERVICE_DISCOVERY_URL)
-                    .retrieve()
-                    .toBodilessEntity()
-                    .map(res -> RUNNING)
-                    .onErrorReturn(DOWN);
-        }
-
         long pid = pidStoreService.getSavedPid(serviceName);
         if (pid == -1 || !pidStoreService.isOsProcessAlive(pid)) {
             return Mono.just(DOWN);
         }
 
         List<ServiceInstance> instances = discoveryClient.getInstances(serviceName.toUpperCase());
-        if (instances.isEmpty()) {
-            return Mono.just(STARTING);
+        if (!instances.isEmpty()) {
+            String dynamicServiceUri = instances.get(0).getUri().toString();
+            return webClient.get()
+                    .uri(dynamicServiceUri + "/actuator/health")
+                    .retrieve()
+                    .bodyToMono(Map.class)
+                    .map(body -> "UP".equals(body.get("status")) ? RUNNING : STARTING)
+                    .onErrorReturn(STARTING);
         }
 
-        String dynamicServiceUri = instances.get(0).getUri().toString();
-        return webClient.get()
-                .uri(dynamicServiceUri + "/actuator/health")
-                .retrieve()
-                .bodyToMono(Map.class)
-                .map(body -> "UP".equals(body.get("status")) ? RUNNING : STARTING)
-                .onErrorReturn(STARTING);
+        if (SERVICE_LOCAL_MAP.containsKey(serviceName)) {
+            return webClient.get()
+                    .uri(SERVICE_LOCAL_MAP.get(serviceName) + "/actuator/health")
+                    .retrieve()
+                    .bodyToMono(Map.class)
+                    .map(body -> "UP".equals(body.get("status")) ? RUNNING : STARTING)
+                    .onErrorReturn(STARTING);
+        }
+
+        log.info("헬스 체크 중, {}", serviceName);
+        return Mono.just(DOWN);
     }
 }

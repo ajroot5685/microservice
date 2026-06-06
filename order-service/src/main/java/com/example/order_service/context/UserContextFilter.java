@@ -25,6 +25,13 @@ public class UserContextFilter implements Filter {
             throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
+
+        String requestURI = request.getRequestURI();
+        if (requestURI.startsWith("/actuator/health")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         String userId = request.getHeader("userId");
 
         if (userId == null || userId.isEmpty()) {

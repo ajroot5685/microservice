@@ -40,9 +40,9 @@
 
 <h1>MSA 부트 매니저</h1>
 
-<div class="card" id="status-board" hx-get="/fragments/status" hx-trigger="every 3s" hx-swap="outerHTML">
-    <div class="card"
-         style="background: #252525; padding: 15px; margin-bottom: 20px; box-shadow: none; border: 1px solid #3a3a3a;">
+<div id="status-board" hx-get="/fragments/status" hx-trigger="every 3s" hx-swap="outerHTML" class="card">
+    <div style="background: #252525; padding: 15px; margin-bottom: 20px; box-shadow: none; border: 1px solid #3a3a3a;"
+         class="card">
         <div class="infra-header">
             <h3>공통 인프라 환경 (DB)</h3>
             <div>
@@ -120,24 +120,33 @@
     const ws = new WebSocket("ws://localhost:9999/ws/logs");
 
     ws.onopen = function() {
-        document.querySelectorAll('.log-console').forEach(el => {
+        const consoles = Array.from(document.querySelectorAll('.log-console'));
+
+        consoles.forEach((el, index) => {
             const serviceName = el.id.replace("console-", "");
             el.innerHTML = "";
-            ws.send("FETCH_HISTORY:" + serviceName);
+            setTimeout(() => {
+                if (ws.readyState === WebSocket.OPEN) {
+                    ws.send("FETCH_HISTORY:" + serviceName);
+                }
+            }, index * 150);
         });
     };
 
     ws.onmessage = function(event) {
         const rawData = event.data;
-        const match = rawData.match(/^\[([^\]]+)\]\s(.*)$/);
-        if (!match) return;
 
-        const serviceName = match[1];
-        const logLine = match[2];
+        if (!rawData.startsWith("[")) return;
+
+        const closeBracketIndex = rawData.indexOf("]");
+        if (closeBracketIndex === -1) return;
+
+        const serviceName = rawData.substring(1, closeBracketIndex).trim();
+        const logLine = rawData.substring(closeBracketIndex + 1).trimStart();
 
         const consoleDiv = document.getElementById("console-" + serviceName);
         if (consoleDiv) {
-            const isScrolledToBottom = (consoleDiv.scrollHeight - consoleDiv.clientHeight - consoleDiv.scrollTop) < 40;
+            const isScrolledToBottom = (consoleDiv.scrollHeight - consoleDiv.clientHeight - consoleDiv.scrollTop) < 50;
 
             const line = document.createElement("div");
             line.textContent = logLine;
