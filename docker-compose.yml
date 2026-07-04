@@ -64,3 +64,23 @@ services:
         limits:
           cpus: '0.5'
           memory: 512M
+
+  # 4. Spring Cloud Bus 전용 RabbitMQ
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: config_bus
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+      TZ: Asia/Seoul
+    ports:
+      - "5672:5672"   # Spring Boot 애플리케이션(AMQP) 통신용 포트
+      - "15672:15672" # RabbitMQ 웹 관리 대시보드(UI) 포트
+    volumes:
+      - ./rabbitmq_data:/var/lib/rabbitmq
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M

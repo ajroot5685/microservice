@@ -15,12 +15,16 @@ spring:
             - config-files/services
           clone-on-start: true
           force-pull: true
+    stream:
+      bindings:
+        springCloudBusInput:
+          group: ${spring.application.name}-bus-group
 
 management:
   endpoints:
     web:
       exposure:
-        include: "health"
+        include: "health,busrefresh"
   endpoint:
     health:
       show-details: always
