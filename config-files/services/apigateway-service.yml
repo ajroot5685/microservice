@@ -4,6 +4,7 @@ spring:
       - "../common/token.yml"
       - "../common/eureka-client.yml"
       - "../common/actuator.yml"
+      - "../common/cloud-bus.yml"
   cloud:
     gateway:
       server:

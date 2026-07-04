@@ -2,6 +2,7 @@ spring:
   config:
     import:
       - "../common/actuator.yml"
+      - "../common/cloud-bus.yml"
 eureka:
   client:
     register-with-eureka: false

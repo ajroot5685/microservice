@@ -4,6 +4,7 @@ spring:
       - "../common/eureka-client.yml"
       - "../common/actuator.yml"
       - "../common/jpa.yml"
+      - "../common/cloud-bus.yml"
   threads:
     virtual:
       enabled: false

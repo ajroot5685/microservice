@@ -1,0 +1,12 @@
+# target service
+# - service-discovery
+# - apigateway-service
+# - user-service
+# - order-service
+# - catalog-service
+spring:
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
