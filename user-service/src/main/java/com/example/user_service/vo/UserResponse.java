@@ -1,7 +1,9 @@
 package com.example.user_service.vo;
 
+import com.example.user_service.client.OrderResponse;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import java.util.List;
 import lombok.Data;
 
 @Data
@@ -13,4 +15,6 @@ public class UserResponse {
     private String name;
 
     private String userId;
+
+    private List<OrderResponse> orders;
 }

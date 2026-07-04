@@ -1,5 +1,7 @@
 package com.example.user_service.service;
 
+import com.example.user_service.client.OrderResponse;
+import com.example.user_service.client.OrderServiceClient;
 import com.example.user_service.dto.UserDto;
 import com.example.user_service.repository.UserEntity;
 import com.example.user_service.repository.UserRepository;
@@ -23,6 +25,7 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final OrderServiceClient orderServiceClient;
 
     public UserDto createUser(UserDto userDto) {
         userDto.setUserId(UUID.randomUUID().toString());
@@ -48,8 +51,11 @@ public class UserService implements UserDetailsService {
         if (user == null) {
             throw new RuntimeException("User not found");
         }
+        UserDto response = userMapper.toDto(user);
 
-        return userMapper.toDto(user);
+        List<OrderResponse> orders = orderServiceClient.getOrders();
+        response.setOrders(orders);
+        return response;
     }
 
     @Override
