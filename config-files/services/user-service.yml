@@ -8,7 +8,7 @@ spring:
       - "../common/cloud-bus.yml"
   threads:
     virtual:
-      enabled: false
+      enabled: true
   datasource:
     url: jdbc:mysql://localhost:3310/user_db?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     username: root
