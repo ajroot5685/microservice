@@ -1,12 +1,12 @@
 package com.example.user_service.client;
 
 import java.util.List;
-import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.service.annotation.GetExchange;
+import org.springframework.web.service.annotation.HttpExchange;
 
-@FeignClient(name = "order-service", configuration = FeignErrorDecoder.class)
+@HttpExchange
 public interface OrderServiceClient {
 
-    @GetMapping("/orders-np")
+    @GetExchange("/orders")
     List<OrderResponse> getOrders();
 }
