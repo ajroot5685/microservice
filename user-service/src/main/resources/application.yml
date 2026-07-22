@@ -1,13 +1,6 @@
 server:
   port: 0
 
-grpc:
-  client:
-    orderService:
-      address: 'discovery:///ORDER-SERVICE'
-      negotiation-type: plaintext
-      default-load-balancing-policy: round_robin
-
 spring:
   application:
     name: user-service

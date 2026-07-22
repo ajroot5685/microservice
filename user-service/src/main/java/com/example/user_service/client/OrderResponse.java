@@ -2,7 +2,7 @@ package com.example.user_service.client;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import java.time.LocalDateTime;
+import java.util.Date;
 import lombok.Data;
 
 @Data
@@ -17,7 +17,7 @@ public class OrderResponse {
 
     private Integer totalPrice;
 
-    private LocalDateTime createdAt;
+    private Date createdAt;
 
     private String orderId;
 }

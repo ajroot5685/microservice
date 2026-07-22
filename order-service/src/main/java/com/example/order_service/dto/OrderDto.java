@@ -1,6 +1,5 @@
 package com.example.order_service.dto;
 
-import java.time.LocalDateTime;
 import lombok.Data;
 
 @Data
@@ -12,5 +11,4 @@ public class OrderDto {
     private Integer totalPrice;
     private String orderId;
     private String userId;
-    private LocalDateTime createdAt;
 }
