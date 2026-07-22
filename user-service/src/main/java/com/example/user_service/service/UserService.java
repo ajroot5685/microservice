@@ -1,7 +1,7 @@
 package com.example.user_service.service;
 
+import com.example.user_service.client.OrderGrpcService;
 import com.example.user_service.client.OrderResponse;
-import com.example.user_service.client.OrderServiceClient;
 import com.example.user_service.dto.UserDto;
 import com.example.user_service.repository.UserEntity;
 import com.example.user_service.repository.UserRepository;
@@ -25,7 +25,7 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
-    private final OrderServiceClient orderServiceClient;
+    private final OrderGrpcService orderGrpcService;
 
     public UserDto createUser(UserDto userDto) {
         userDto.setUserId(UUID.randomUUID().toString());
@@ -53,7 +53,7 @@ public class UserService implements UserDetailsService {
         }
         UserDto response = userMapper.toDto(user);
 
-        List<OrderResponse> orders = orderServiceClient.getOrders();
+        List<OrderResponse> orders = orderGrpcService.getOrders();
         response.setOrders(orders);
         return response;
     }

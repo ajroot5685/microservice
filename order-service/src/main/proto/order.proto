@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+option java_multiple_files = true;
+option java_package = "com.example.order";
+
+service OrderService {
+  rpc GetOrder (google.protobuf.Empty) returns (OrderListResponse);
+}
+
+message OrderListResponse {
+  repeated OrderResponse orders = 1;
+}
+
+message OrderResponse {
+  string product_id = 1;
+  int32 qty = 2;
+  int32 unit_price = 3;
+  int32 total_price = 4;
+  google.protobuf.Timestamp created_at = 5;
+  string order_id = 6;
+}
