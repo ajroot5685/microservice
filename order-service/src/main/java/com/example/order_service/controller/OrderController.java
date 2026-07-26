@@ -35,7 +35,7 @@ public class OrderController {
 
         OrderDto order = orderService.createOrder(dto);
         kafkaProducer.send("example-catalog-topic", order);
-        
+
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(orderMapper.toResponse(order));
     }

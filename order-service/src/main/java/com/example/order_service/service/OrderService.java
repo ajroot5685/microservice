@@ -1,6 +1,10 @@
 package com.example.order_service.service;
 
+import com.example.order_service.client.CatalogResponse;
+import com.example.order_service.client.CatalogServiceClient;
 import com.example.order_service.dto.OrderDto;
+import com.example.order_service.exception.CatalogNotFoundException;
+import com.example.order_service.exception.OutOfStockException;
 import com.example.order_service.repository.OrderEntity;
 import com.example.order_service.repository.OrderRepository;
 import java.util.List;
@@ -17,10 +21,17 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
+    private final CatalogServiceClient catalogServiceClient;
 
     @Transactional
     public OrderDto createOrder(OrderDto orderDto) {
-        // TODO: catalog 서비스에 상품 조회 및 재고 확인 로직 추가
+        CatalogResponse catalog = catalogServiceClient.getCatalog(orderDto.getProductId());
+        if (catalog == null) {
+            throw new CatalogNotFoundException("존재하지 않는 상품입니다.");
+        }
+        if (catalog.getStock() == null || catalog.getStock() < orderDto.getQty()) {
+            throw new OutOfStockException("재고가 부족합니다. 요청 재고: " + orderDto.getQty() + " 현재 재고: " + catalog.getStock());
+        }
 
         orderDto.setOrderId(UUID.randomUUID().toString());
         orderDto.setTotalPrice(orderDto.getQty() * orderDto.getUnitPrice());

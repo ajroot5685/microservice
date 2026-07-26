@@ -14,18 +14,17 @@ import org.springframework.stereotype.Service;
 public class KafkaProducer {
 
     private final KafkaTemplate<String, String> kafkaTemplate;
+    private final ObjectMapper mapper;
 
     public OrderDto send(String topic, OrderDto orderDto) {
-        ObjectMapper mapper = new ObjectMapper();
-        String jsonInString = "";
         try {
-            jsonInString = mapper.writeValueAsString(orderDto);
+            String jsonInString = mapper.writeValueAsString(orderDto);
+
+            kafkaTemplate.send(topic, jsonInString);
+            log.info("Kafka Producer 데이터 전송, topic: {}, orderDto: {}", topic, orderDto);
         } catch (JsonProcessingException ex) {
             ex.printStackTrace();
         }
-
-        kafkaTemplate.send(topic, jsonInString);
-        log.info("Kafka Producer 데이터 전송, topic: {}, orderDto: {}", topic, orderDto);
 
         return orderDto;
     }

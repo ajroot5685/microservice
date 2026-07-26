@@ -1,6 +1,7 @@
 package com.example.catalog_service.service;
 
 import com.example.catalog_service.dto.CatalogDto;
+import com.example.catalog_service.repository.CatalogEntity;
 import com.example.catalog_service.repository.CatalogRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,11 @@ public class CatalogService {
         return catalogRepository.findAll().stream()
                 .map(catalogMapper::toDto)
                 .toList();
+    }
+
+    public CatalogDto getCatalog(String productId) {
+        CatalogEntity catalog = catalogRepository.findByProductId(productId);
+        return catalogMapper.toDto(catalog);
     }
 
     public List<CatalogDto> searchCatalogs(String productName) {

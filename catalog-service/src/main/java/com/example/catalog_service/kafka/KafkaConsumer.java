@@ -18,13 +18,13 @@ import org.springframework.stereotype.Service;
 public class KafkaConsumer {
 
     private final CatalogRepository repository;
+    private final ObjectMapper mapper;
 
     @KafkaListener(topics = "example-catalog-topic")
     public void updateQty(String kafkaMessage) {
         log.info("Kafka Message: -> {}", kafkaMessage);
 
         Map<Object, Object> map = new HashMap<>();
-        ObjectMapper mapper = new ObjectMapper();
         try {
             map = mapper.readValue(kafkaMessage, new TypeReference<>() {});
         } catch (JsonProcessingException ex) {
