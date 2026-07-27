@@ -3,6 +3,7 @@ package com.example.catalog_service.controller;
 import com.example.catalog_service.service.CatalogMapper;
 import com.example.catalog_service.service.CatalogService;
 import com.example.catalog_service.vo.CatalogResponse;
+import com.example.catalog_service.vo.ListResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,11 +24,11 @@ public class CatalogController {
     private final CatalogMapper catalogMapper;
 
     @GetMapping
-    public ResponseEntity<List<CatalogResponse>> getCatalogs() {
+    public ResponseEntity<ListResponse<CatalogResponse>> getCatalogs() {
         List<CatalogResponse> response = catalogService.getAllCatalogs().stream()
                 .map(catalogMapper::toResponse)
                 .toList();
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ListResponse.of(response));
     }
 
     @GetMapping("/{productId}")
@@ -37,10 +38,10 @@ public class CatalogController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<CatalogResponse>> searchCatalogs(@RequestParam(value = "keyword") String keyword) {
+    public ResponseEntity<ListResponse<CatalogResponse>> searchCatalogs(@RequestParam(value = "keyword") String keyword) {
         List<CatalogResponse> response = catalogService.searchCatalogs(keyword).stream()
                 .map(catalogMapper::toResponse)
                 .toList();
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ListResponse.of(response));
     }
 }

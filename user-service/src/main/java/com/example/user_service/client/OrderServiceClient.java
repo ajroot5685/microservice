@@ -1,6 +1,6 @@
 package com.example.user_service.client;
 
-import java.util.List;
+import com.example.user_service.vo.ListResponse;
 import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;
 
@@ -8,5 +8,5 @@ import org.springframework.web.service.annotation.HttpExchange;
 public interface OrderServiceClient {
 
     @GetExchange("/orders")
-    List<OrderResponse> getOrders();
+    ListResponse<OrderResponse> getOrders();
 }

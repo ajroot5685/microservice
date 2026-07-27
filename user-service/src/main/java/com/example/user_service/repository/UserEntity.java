@@ -34,7 +34,7 @@ public class UserEntity {
     @Column(nullable = false, unique = true)
     private String userId;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String encryptedPwd;
 
     @Enumerated(EnumType.STRING)

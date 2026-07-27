@@ -6,6 +6,7 @@ import com.example.user_service.dto.UserDto;
 import com.example.user_service.repository.UserEntity;
 import com.example.user_service.repository.UserRepository;
 import com.example.user_service.repository.UserRole;
+import com.example.user_service.vo.ListResponse;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -53,7 +54,7 @@ public class UserService implements UserDetailsService {
         }
         UserDto response = userMapper.toDto(user);
 
-        List<OrderResponse> orders = orderServiceClient.getOrders();
+        ListResponse<OrderResponse> orders = orderServiceClient.getOrders();
         response.setOrders(orders);
         return response;
     }

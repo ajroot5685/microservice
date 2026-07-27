@@ -5,6 +5,7 @@ import com.example.order_service.dto.OrderDto;
 import com.example.order_service.kafka.KafkaProducer;
 import com.example.order_service.service.OrderMapper;
 import com.example.order_service.service.OrderService;
+import com.example.order_service.vo.ListResponse;
 import com.example.order_service.vo.OrderRequest;
 import com.example.order_service.vo.OrderResponse;
 import java.util.List;
@@ -41,10 +42,10 @@ public class OrderController {
     }
 
     @GetMapping("/orders")
-    public ResponseEntity<List<OrderResponse>> getOrders() {
+    public ResponseEntity<ListResponse<OrderResponse>> getOrders() {
         List<OrderResponse> orders = orderService.getOrdersByUserId(UserContext.getUserId()).stream()
                 .map(orderMapper::toResponse)
                 .toList();
-        return ResponseEntity.ok(orders);
+        return ResponseEntity.ok(ListResponse.of(orders));
     }
 }
