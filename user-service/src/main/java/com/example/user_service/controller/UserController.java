@@ -41,7 +41,6 @@ public class UserController {
 
     @GetMapping("/users/{userId}")
     public ResponseEntity<UserResponse> getUser(@PathVariable("userId") String userId) {
-        log.info("user");
         UserDto userDto = userService.getUserByUserId(userId);
         return ResponseEntity.ok(userMapper.toResponse(userDto));
     }

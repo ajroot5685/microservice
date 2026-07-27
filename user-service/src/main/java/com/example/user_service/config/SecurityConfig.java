@@ -50,7 +50,7 @@ public class SecurityConfig {
                                 "/signup",
                                 "/login",
                                 "/users/**",
-                                "/actuator/**",
+                                "/actuator/health",
                                 "/error"
                         ).permitAll()
                         .anyRequest().authenticated());

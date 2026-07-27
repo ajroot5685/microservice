@@ -16,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -43,10 +42,7 @@ public class OrderController {
     }
 
     @GetMapping("/orders")
-    public ResponseEntity<ListResponse<OrderResponse>> getOrders(@RequestHeader("traceparent") String traceparent) {
-        // traceparent 수동 주입으로 헤더 전달된 것을 확인했으나, 이를 받는 쪽에서도 제대로 처리하지 못하는 현상으로 인해
-        // 같은 요청에 대해 같은 traceId로 묶는것에 실패함
-        log.info("traceparent: {}", traceparent);
+    public ResponseEntity<ListResponse<OrderResponse>> getOrders() {
         List<OrderResponse> orders = orderService.getOrdersByUserId(UserContext.getUserId()).stream()
                 .map(orderMapper::toResponse)
                 .toList();

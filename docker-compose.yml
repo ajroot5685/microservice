@@ -15,12 +15,11 @@ services:
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
-      - --innodb-buffer-pool-size=64M
     deploy:
       resources:
         limits:
           cpus: '0.5'
-          memory: 256M
+          memory: 512M
 
   # 2. Order 도메인 DB
   order-db:
@@ -38,12 +37,11 @@ services:
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
-      - --innodb-buffer-pool-size=64M
     deploy:
       resources:
         limits:
           cpus: '0.5'
-          memory: 256M
+          memory: 512M
 
   # 3. Catalog 도메인 DB
   catalog-db:
@@ -61,12 +59,11 @@ services:
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
-      - --innodb-buffer-pool-size=64M
     deploy:
       resources:
         limits:
           cpus: '0.5'
-          memory: 256M
+          memory: 512M
 
   # 4. Spring Cloud Bus 전용 RabbitMQ
   rabbitmq:
@@ -85,8 +82,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.2'
-          memory: 256M
+          cpus: '0.5'
+          memory: 512M
 
   # 5. Apache Kafka (KRaft 모드 - 주키퍼 미사용)
   kafka:
@@ -115,15 +112,15 @@ services:
       # 고유 클러스터 ID (KRaft 구동 필수)
       CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
       # 컨테이너 메모리 제한에 맞게 JVM 힙 크기 조절
-      KAFKA_HEAP_OPTS: "-Xmx256m -Xms256m"
+      KAFKA_HEAP_OPTS: "-Xmx384m -Xms384m"
       TZ: Asia/Seoul
     volumes:
       - ./kafka_data:/var/lib/kafka/data
     deploy:
       resources:
         limits:
-          cpus: '0.5'
-          memory: 512M
+          cpus: '1.0'
+          memory: 768M
 
   # 6. Kafka 웹 모니터링 UI
   kafka-ui:
@@ -139,126 +136,36 @@ services:
       KAFKA_CLUSTERS_0_KAFKACONNECT_0_ADDRESS: "http://kafka-connect:8083"
     depends_on:
       - kafka
+      - kafka-connect
     deploy:
       resources:
         limits:
-          cpus: '0.2'
-          memory: 128M
+          cpus: '0.5'
+          memory: 256M
 
   # 7. Kafka Connect + Debezium MySQL 플러그인
-#  kafka-connect:
-#    image: debezium/connect:2.7.3.Final
-#    container_name: kafka_connect
-#    restart: unless-stopped
-#    ports:
-#      - "8083:8083"
-#    environment:
-#      BOOTSTRAP_SERVERS: "kafka:29092"
-#      GROUP_ID: "msa-connect-group"
-#      CONFIG_STORAGE_TOPIC: "connect-configs"
-#      OFFSET_STORAGE_TOPIC: "connect-offsets"
-#      STATUS_STORAGE_TOPIC: "connect-status"
-#      CONFIG_STORAGE_REPLICATION_FACTOR: "1"
-#      OFFSET_STORAGE_REPLICATION_FACTOR: "1"
-#      STATUS_STORAGE_REPLICATION_FACTOR: "1"
-#      KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
-#      VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
-#    depends_on:
-#      - kafka
-#      - order-db
-#    deploy:
-#      resources:
-#        limits:
-#          cpus: '0.5'
-#          memory: 512M
-
-## 분산 추적 및 모니터링 애플리케이션은 버전 및 리소스 문제로 스킵
-  # 8. Prometheus (메트릭 수집 저장소)
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: prometheus
+  kafka-connect:
+    image: debezium/connect:2.7.3.Final
+    container_name: kafka_connect
     restart: unless-stopped
     ports:
-      - "9090:9090"
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - "8083:8083"
     environment:
-      TZ: Asia/Seoul
-    deploy:
-      resources:
-        limits:
-          cpus: '0.2'
-          memory: 256M
-
-  # 9. Loki (로그 수집 저장소)
-  loki:
-    image: grafana/loki:latest
-    container_name: loki
-    restart: unless-stopped
-    ports:
-      - "3100:3100"
-    command: -config.file=/etc/loki/local-config.yaml
-    environment:
-      TZ: Asia/Seoul
-    deploy:
-      resources:
-        limits:
-          cpus: '0.2'
-          memory: 256M
-
-  # 10. Grafana (통합 대시보드 UI)
-  grafana:
-    image: grafana/grafana:latest
-    container_name: grafana
-    restart: unless-stopped
-    ports:
-      - "3000:3000"   # Grafana 대시보드 UI 포트
-    environment:
-      TZ: Asia/Seoul
+      BOOTSTRAP_SERVERS: "kafka:29092"
+      GROUP_ID: "msa-connect-group"
+      CONFIG_STORAGE_TOPIC: "connect-configs"
+      OFFSET_STORAGE_TOPIC: "connect-offsets"
+      STATUS_STORAGE_TOPIC: "connect-status"
+      CONFIG_STORAGE_REPLICATION_FACTOR: "1"
+      OFFSET_STORAGE_REPLICATION_FACTOR: "1"
+      STATUS_STORAGE_REPLICATION_FACTOR: "1"
+      KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
     depends_on:
-      - prometheus
-      - loki
+      - kafka
+      - order-db
     deploy:
       resources:
         limits:
-          cpus: '0.2'
+          cpus: '0.5'
           memory: 512M
-
-  # 11. OpenTelemetry Collector (추적 및 텔레메트리 중계자)
-  otel:
-    image: otel/opentelemetry-collector-contrib:0.100.0
-    container_name: otel
-    restart: unless-stopped
-    command: [ "--config=/etc/otel-collector-config.yaml" ]
-    ports:
-      - "4317:4317"   # OTLP gRPC 포트
-      - "4318:4318"   # OTLP HTTP 포트
-      - "8899:8888"   # Collector 자체 Prometheus 메트릭 포트
-    volumes:
-      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
-    deploy:
-      resources:
-        limits:
-          cpus: '0.2'
-          memory: 128M
-
-  # 12. Tempo (분산 추적 저장소)
-  tempo:
-    image: grafana/tempo:latest
-    container_name: tempo
-    restart: unless-stopped
-    command: [ "-config.file=/etc/tempo.yaml" ]
-    ports:
-      - "3200:3200"   # Tempo API 포트
-    volumes:
-      - ./tempo.yaml:/etc/tempo.yaml
-      - ./tempo_data:/tmp/tempo
-    environment:
-      TZ: Asia/Seoul
-    deploy:
-      resources:
-        limits:
-          cpus: '0.3'
-          memory: 256M
