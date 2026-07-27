@@ -8,26 +8,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: "*"
+        include: "health,busrefresh"
   endpoint:
     health:
       show-details: always
-  tracing:
-    enabled: true
-    sampling:
-      probability: 1.0
-  otlp:
-    tracing:
-      endpoint: http://localhost:4318/v1/traces
-      transport: http
-    metrics:
-      export:
-        url: http://localhost:4318/v1/metrics
-        step: 5s
-    logging:
-      export:
-        url: http://localhost:4318/v1/logs
-
-logging:
-  pattern:
-    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
