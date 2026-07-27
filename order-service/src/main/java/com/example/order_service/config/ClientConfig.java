@@ -1,5 +1,7 @@
-package com.example.order_service.client;
+package com.example.order_service.config;
 
+import com.example.order_service.client.CatalogServiceClient;
+import com.example.order_service.client.RestClientErrorHandler;
 import com.example.order_service.context.UserContextFilter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,8 +23,8 @@ public class ClientConfig {
     private final LoadBalancerInterceptor loadBalancerInterceptor;
 
     @Bean
-    public CatalogServiceClient catalogServiceClient() {
-        RestClient client = RestClient.builder()
+    public CatalogServiceClient catalogServiceClient(RestClient.Builder restClientBuilder) {
+        RestClient client = restClientBuilder
                 .baseUrl("http://CATALOG-SERVICE")
                 .requestFactory(new SimpleClientHttpRequestFactory() {{
                     setConnectTimeout(1000);

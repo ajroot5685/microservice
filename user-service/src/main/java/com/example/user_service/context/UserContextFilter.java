@@ -16,7 +16,7 @@ public class UserContextFilter implements Filter {
 
     public static final ScopedValue<String> USER_ID = ScopedValue.newInstance();
 
-    private final List<String> whiteList = List.of("/actuator/health", "/signup", "/login");
+    private final List<String> whiteList = List.of("/actuator", "/signup", "/login");
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain)
