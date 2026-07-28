@@ -13,3 +13,5 @@ spring:
     username: root
     password: order12
     driver-class-name: com.mysql.cj.jdbc.Driver
+  mongodb:
+    uri: mongodb://root:1234@localhost:27017/order-query?authSource=admin
