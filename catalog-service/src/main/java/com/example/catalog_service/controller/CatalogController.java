@@ -44,4 +44,12 @@ public class CatalogController {
                 .toList();
         return ResponseEntity.ok(ListResponse.of(response));
     }
+
+    @GetMapping("/search/ES")
+    public ResponseEntity<ListResponse<CatalogResponse>> searchCatalogsFromES(@RequestParam(value = "keyword") String keyword) {
+        List<CatalogResponse> response = catalogService.searchCatalogsFromES(keyword).stream()
+                .map(catalogMapper::toResponse)
+                .toList();
+        return ResponseEntity.ok(ListResponse.of(response));
+    }
 }
