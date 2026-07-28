@@ -20,7 +20,7 @@ public class KafkaConsumer {
     private final CatalogRepository repository;
     private final ObjectMapper mapper;
 
-    @KafkaListener(topics = "example-catalog-topic")
+    @KafkaListener(topics = "order-create")
     public void updateQty(String kafkaMessage) {
         log.info("Kafka Message: -> {}", kafkaMessage);
 

@@ -45,6 +45,12 @@ public class UserController {
         return ResponseEntity.ok(userMapper.toResponse(userDto));
     }
 
+    @GetMapping("/users/{userId}/mongo")
+    public ResponseEntity<UserResponse> getUserFromMongo(@PathVariable("userId") String userId) {
+        UserDto userDto = userService.getUserByUserIdFromMongo(userId);
+        return ResponseEntity.ok(userMapper.toResponse(userDto));
+    }
+
     @PostMapping("/signup")
     public ResponseEntity<UserResponse> createUser(@RequestBody UserRequest request) {
         UserDto userDto = userService.createUser(userMapper.toDto(request));

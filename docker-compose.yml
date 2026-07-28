@@ -136,7 +136,6 @@ services:
       KAFKA_CLUSTERS_0_KAFKACONNECT_0_ADDRESS: "http://kafka-connect:8083"
     depends_on:
       - kafka
-      - kafka-connect
     deploy:
       resources:
         limits:
@@ -144,26 +143,45 @@ services:
           memory: 256M
 
   # 7. Kafka Connect + Debezium MySQL 플러그인
-  kafka-connect:
-    image: debezium/connect:2.7.3.Final
-    container_name: kafka_connect
+#  kafka-connect:
+#    image: debezium/connect:2.7.3.Final
+#    container_name: kafka_connect
+#    restart: unless-stopped
+#    ports:
+#      - "8083:8083"
+#    environment:
+#      BOOTSTRAP_SERVERS: "kafka:29092"
+#      GROUP_ID: "msa-connect-group"
+#      CONFIG_STORAGE_TOPIC: "connect-configs"
+#      OFFSET_STORAGE_TOPIC: "connect-offsets"
+#      STATUS_STORAGE_TOPIC: "connect-status"
+#      CONFIG_STORAGE_REPLICATION_FACTOR: "1"
+#      OFFSET_STORAGE_REPLICATION_FACTOR: "1"
+#      STATUS_STORAGE_REPLICATION_FACTOR: "1"
+#      KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+#      VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+#    depends_on:
+#      - kafka
+#      - order-db
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: '0.5'
+#          memory: 512M
+
+  # 8. CQRS Read DB - MongoDB (주문 조회 전용 Read Model)
+  mongo-db:
+    image: mongo:7.0
+    container_name: mongo_db
     restart: unless-stopped
-    ports:
-      - "8083:8083"
     environment:
-      BOOTSTRAP_SERVERS: "kafka:29092"
-      GROUP_ID: "msa-connect-group"
-      CONFIG_STORAGE_TOPIC: "connect-configs"
-      OFFSET_STORAGE_TOPIC: "connect-offsets"
-      STATUS_STORAGE_TOPIC: "connect-status"
-      CONFIG_STORAGE_REPLICATION_FACTOR: "1"
-      OFFSET_STORAGE_REPLICATION_FACTOR: "1"
-      STATUS_STORAGE_REPLICATION_FACTOR: "1"
-      KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
-      VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
-    depends_on:
-      - kafka
-      - order-db
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: 1234
+      TZ: Asia/Seoul
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./mongo_data:/data/db
     deploy:
       resources:
         limits:

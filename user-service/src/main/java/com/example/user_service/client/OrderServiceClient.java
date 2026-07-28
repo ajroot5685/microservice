@@ -9,4 +9,7 @@ public interface OrderServiceClient {
 
     @GetExchange("/orders")
     ListResponse<OrderResponse> getOrders();
+
+    @GetExchange("/orders/mongo")
+    ListResponse<OrderResponse> getOrdersFromMongo();
 }

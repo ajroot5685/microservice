@@ -5,7 +5,9 @@ import com.example.order_service.client.CatalogServiceClient;
 import com.example.order_service.dto.OrderDto;
 import com.example.order_service.exception.CatalogNotFoundException;
 import com.example.order_service.exception.OutOfStockException;
+import com.example.order_service.repository.OrderDocument;
 import com.example.order_service.repository.OrderEntity;
+import com.example.order_service.repository.OrderMongoRepository;
 import com.example.order_service.repository.OrderRepository;
 import java.util.List;
 import java.util.UUID;
@@ -22,6 +24,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
     private final CatalogServiceClient catalogServiceClient;
+    private final OrderMongoRepository orderMongoRepository;
 
     @Transactional
     public OrderDto createOrder(OrderDto orderDto) {
@@ -52,5 +55,9 @@ public class OrderService {
         return orderRepository.findByUserId(userId).stream()
                 .map(orderMapper::toDto)
                 .toList();
+    }
+
+    public List<OrderDocument> getOrderDocumentsByUserId(String userId) {
+        return orderMongoRepository.findByUserId(userId);
     }
 }

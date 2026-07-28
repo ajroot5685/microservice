@@ -59,6 +59,18 @@ public class UserService implements UserDetailsService {
         return response;
     }
 
+    public UserDto getUserByUserIdFromMongo(String userId) {
+        UserEntity user = userRepository.findByUserId(userId);
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+        UserDto response = userMapper.toDto(user);
+
+        ListResponse<OrderResponse> orders = orderServiceClient.getOrdersFromMongo();
+        response.setOrders(orders);
+        return response;
+    }
+
     @Override
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
         UserEntity user = userRepository.findByUserId(userId);

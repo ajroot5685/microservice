@@ -1,4 +1,4 @@
-package com.example.catalog_service.kafka;
+package com.example.order_service.kafka;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +19,7 @@ public class KafkaConsumerConfig {
     public ConsumerFactory<String, String> consumerFactory() {
         Map<String, Object> properties = new HashMap<>();
         properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
-        properties.put(ConsumerConfig.GROUP_ID_CONFIG, "catalog-update-group");
+        properties.put(ConsumerConfig.GROUP_ID_CONFIG, "order-query-group");
         properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 

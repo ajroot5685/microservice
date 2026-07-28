@@ -1,6 +1,7 @@
 package com.example.order_service.service;
 
 import com.example.order_service.dto.OrderDto;
+import com.example.order_service.repository.OrderDocument;
 import com.example.order_service.repository.OrderEntity;
 import com.example.order_service.vo.OrderRequest;
 import com.example.order_service.vo.OrderResponse;
@@ -16,4 +17,6 @@ public interface OrderMapper {
     OrderDto toDto(OrderRequest orderRequest);
 
     OrderResponse toResponse(OrderDto orderDto);
+
+    OrderResponse toResponse(OrderDocument orderDocument);
 }

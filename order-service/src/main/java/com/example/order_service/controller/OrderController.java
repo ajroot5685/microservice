@@ -35,7 +35,7 @@ public class OrderController {
         dto.setUserId(UserContext.getUserId());
 
         OrderDto order = orderService.createOrder(dto);
-        kafkaProducer.send("example-catalog-topic", order);
+        kafkaProducer.send("order-create", order);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(orderMapper.toResponse(order));
@@ -44,6 +44,14 @@ public class OrderController {
     @GetMapping("/orders")
     public ResponseEntity<ListResponse<OrderResponse>> getOrders() {
         List<OrderResponse> orders = orderService.getOrdersByUserId(UserContext.getUserId()).stream()
+                .map(orderMapper::toResponse)
+                .toList();
+        return ResponseEntity.ok(ListResponse.of(orders));
+    }
+
+    @GetMapping("/orders/mongo")
+    public ResponseEntity<ListResponse<OrderResponse>> getOrdersFromMongo() {
+        List<OrderResponse> orders = orderService.getOrderDocumentsByUserId(UserContext.getUserId()).stream()
                 .map(orderMapper::toResponse)
                 .toList();
         return ResponseEntity.ok(ListResponse.of(orders));
