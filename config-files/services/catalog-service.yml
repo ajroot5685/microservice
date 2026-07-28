@@ -13,5 +13,3 @@ spring:
     username: root
     password: catalog12
     driver-class-name: com.mysql.cj.jdbc.Driver
-  elasticsearch:
-    uris: http://localhost:9200
