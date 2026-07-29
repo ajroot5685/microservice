@@ -16,10 +16,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
+@RequestMapping("/orders")
 @RequiredArgsConstructor
 public class OrderController {
 
@@ -27,7 +29,7 @@ public class OrderController {
     private final OrderMapper orderMapper;
     private final KafkaProducer kafkaProducer;
 
-    @PostMapping("/orders")
+    @PostMapping
     public ResponseEntity<OrderResponse> createOrder(
             @RequestBody OrderRequest orderRequest
     ) {
@@ -41,7 +43,7 @@ public class OrderController {
                 .body(orderMapper.toResponse(order));
     }
 
-    @GetMapping("/orders")
+    @GetMapping
     public ResponseEntity<ListResponse<OrderResponse>> getOrders() {
         List<OrderResponse> orders = orderService.getOrdersByUserId(UserContext.getUserId()).stream()
                 .map(orderMapper::toResponse)
@@ -49,7 +51,7 @@ public class OrderController {
         return ResponseEntity.ok(ListResponse.of(orders));
     }
 
-    @GetMapping("/orders/mongo")
+    @GetMapping("/mongo")
     public ResponseEntity<ListResponse<OrderResponse>> getOrdersFromMongo() {
         List<OrderResponse> orders = orderService.getOrderDocumentsByUserId(UserContext.getUserId()).stream()
                 .map(orderMapper::toResponse)
